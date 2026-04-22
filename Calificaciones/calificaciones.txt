@@ -1,0 +1,3 @@
+Ismael|Calculo Integral|70.0
+Ismael|Calculo Integral|70.0
+Gabriel|Calculo Diferencial|100.0

@@ -1,0 +1,3 @@
+2019001|Juan Pérez|Ingeniería|8.5
+2019002|María López|Medicina|9.1
+123456789|Luis|Ingenieria Civil|80.0
