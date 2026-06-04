@@ -9,16 +9,15 @@ import javax.swing.table.DefaultTableModel;
  * @author Lenovo
  */
 public class UIPrincipal extends javax.swing.JFrame {
-
     ArchivoInventario archivo;
     DefaultTableModel modelo;
-
     public UIPrincipal() throws IOException {
         initComponents();
-        archivo = new ArchivoInventario("inventario.dat");
-        modelo = new DefaultTableModel(new String[]{"ID", "Nombre", "Desc", "Exist", "Estado"}, 0);
-        this.tblProductos.setModel(modelo);
+        archivo = new ArchivoInventario("inventario.csv");
+        modelo = (DefaultTableModel) this.tblProductos.getModel();
         this.listar();
+
+    
     }
 
     /**
@@ -53,6 +52,8 @@ public class UIPrincipal extends javax.swing.JFrame {
         btnBuscar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        panelTitulo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("ABARROTES LOS PRIMOS");
@@ -134,6 +135,7 @@ public class UIPrincipal extends javax.swing.JFrame {
 
         txtId.setColumns(5);
         txtId.setPreferredSize(new java.awt.Dimension(150, 22));
+        txtId.addActionListener(this::txtIdActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -215,12 +217,11 @@ public class UIPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    void listar() {
+        void listar() {
         try {
             modelo.setRowCount(0);
-            int total = archivo.totalRegistros();
-            for (int i = 0; i < total; i++) {
-                Producto p = archivo.leer(i);
+            java.util.List<Producto> lista = archivo.leerTodos();
+            for (Producto p : lista) {
                 if (p != null && p.estado) {
                     modelo.addRow(new Object[]{p.id, p.nombre, p.descripcion, p.existencia, p.estado});
                 }
@@ -234,98 +235,42 @@ public class UIPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreActionPerformed
 
     private void btnGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGuardarMouseClicked
-        // TODO add your handling code here:
         try {
-            
-            //int pos = archivo.totalRegistros();
-            //24920215
-            String codigo = txtId.getText();
-            codigo = codigo.substring(5);            
-            int pos = Integer.parseInt(codigo);                        
-            
+               Producto p = new Producto(
+                       Integer.parseInt(txtId.getText()),
+                       txtNombre.getText(),
+                       txtDescripcion.getText(),
+                       Integer.parseInt(txtExistencia.getText()),
+                       true
+               );
 
-            Producto p = new Producto(
-                    Integer.parseInt(txtId.getText()),
-                    txtNombre.getText(),
-                    txtDescripcion.getText(),
-                    Integer.parseInt(txtExistencia.getText()),
-                    true
-            );
+               archivo.guardar(p);
+               listar();
 
-            archivo.guardar(p, pos);
-            listar();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+           } catch (Exception ex) {
+               ex.printStackTrace();
+           }
     }//GEN-LAST:event_btnGuardarMouseClicked
-
-    private int obtenerNumRegistro(String idTabla) {
-        int idBuscar = Integer.parseInt(idTabla);
-        
-        try {
-            int total = archivo.totalRegistros();
-            for (int i = 0; i < total; i++) {
-                Producto p = archivo.leer(i);
-                if (p != null) {
-                    if (p.id == idBuscar) {
-                        return i;
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return -1;
-    }
-    
+  
     private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked
-        // TODO add your handling code here:
         try {
             int fila = this.tblProductos.getSelectedRow();
-
-            System.out.println("fila" + fila);
-            if (fila == -1) {
-                return;
+            if (fila != -1) {
+                int idTabla = Integer.parseInt(this.tblProductos.getValueAt(fila, 0).toString());
+                Producto p = archivo.buscarPorId(idTabla);
+                if (p != null) {
+                    p.estado = false;
+                    archivo.guardar(p);
+                    listar();
+                }
             }
-
-            String idTabla = this.tblProductos.getValueAt(fila, 0).toString();
-            int pos = obtenerNumRegistro(idTabla);
-            System.out.println("Numero de registro en archivo: " + pos);
-            System.out.println("idTabla:" + idTabla);
-            Producto p = archivo.leer(pos); //acceso directo
-            p.estado = false;
-            archivo.guardar(p, pos);
-            listar();
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_btnEliminarMouseClicked
 
     private void btnActualizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseClicked
-        try {
-
-            int fila = this.tblProductos.getSelectedRow();
-            if (fila == -1) {
-                return;
-            }
-
-            String idTabla = this.tblProductos.getValueAt(fila, 0).toString();
-            int pos = obtenerNumRegistro(idTabla);
-            Producto p = new Producto(
-                    Integer.parseInt(txtId.getText()),
-                    txtNombre.getText(),
-                    txtDescripcion.getText(),
-                    Integer.parseInt(txtExistencia.getText()),
-                    true
-            );
-
-            archivo.guardar(p, pos);
-            listar();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }   
+        btnGuardarMouseClicked(evt); 
     }//GEN-LAST:event_btnActualizarMouseClicked
 
     private void btnReporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnReporteMouseClicked
@@ -333,65 +278,43 @@ public class UIPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnReporteMouseClicked
 
     private void tblProductosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductosMouseClicked
-        // TODO add your handling code here:
         int fila = this.tblProductos.getSelectedRow();
-
-        if (fila == -1) {
-            return;
-        }
+        if (fila == -1) return;
 
         try {
-            String idTabla = this.tblProductos.getValueAt(fila, 0).toString();
-            int pos = obtenerNumRegistro(idTabla);
-            Producto p = archivo.leer(pos);
+            int idTabla = Integer.parseInt(this.tblProductos.getValueAt(fila, 0).toString());
+            Producto p = archivo.buscarPorId(idTabla);
 
-            txtId.setText(String.valueOf(p.id));
-            txtNombre.setText(p.nombre);
-            txtDescripcion.setText(p.descripcion);
-            txtExistencia.setText(String.valueOf(p.existencia));
-
+            if (p != null) {
+                txtId.setText(String.valueOf(p.id));
+                txtNombre.setText(p.nombre);
+                txtDescripcion.setText(p.descripcion);
+                txtExistencia.setText(String.valueOf(p.existencia));
+            }
         } catch (IOException ex) {
-
-            System.getLogger(UIPrincipal.class.getName())
-                .log(System.Logger.Level.ERROR, (String) null, ex);  
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_tblProductosMouseClicked
 
     private void btnBuscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBuscarMouseClicked
-        // TODO add your handling code here:
-        //int idBuscar = Integer.parseInt(this.txtId.getText());        
-        String codigo = txtId.getText();
-        codigo = codigo.substring(5);            
-        int idBuscar = Integer.parseInt(codigo);                                            
         try {
-            Producto p = archivo.leer(idBuscar);
-            txtNombre.setText(p.nombre);
-            txtDescripcion.setText(p.descripcion);
-            txtExistencia.setText(String.valueOf(p.existencia));                        
-            //this.tblProductos.setRowSelectionInterval(i, i);
-            return;
-            /*int total = archivo.totalRegistros();
-            for (int i = 0; i < total; i++) {
-                Producto p = archivo.leer(i);
-                if (p != null && p.estado) {
-                    if (idBuscar == p.id) {
-                        //txtId.setText(String.valueOf(p.id));
-                        txtNombre.setText(p.nombre);
-                        txtDescripcion.setText(p.descripcion);
-                        txtExistencia.setText(String.valueOf(p.existencia));
-                        int idTabla = Integer.parseInt(this.tblProductos.getValueAt(i, 0).toString());
-                        this.tblProductos.setRowSelectionInterval(i, i);
-                        return;
-                    }
-                    //modelo.addRow(new Object[]{p.id, p.nombre, p.descripcion, p.existencia, p.estado});
-                }
+            int idBuscar = Integer.parseInt(txtId.getText());
+            Producto p = archivo.buscarPorId(idBuscar);
+            if (p != null && p.estado) {
+                txtNombre.setText(p.nombre);
+                txtDescripcion.setText(p.descripcion);
+                txtExistencia.setText(String.valueOf(p.existencia));
+            } else {
+                JOptionPane.showMessageDialog(this, "No encontrado");
             }
-            */
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        JOptionPane.showMessageDialog(this, "No se encuentra el registro");
     }//GEN-LAST:event_btnBuscarMouseClicked
+
+    private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdActionPerformed
 
     /**
      * @param args the command line arguments

@@ -1,42 +1,82 @@
 package inventarioui;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class ArchivoInventario {
-    RandomAccessFile archivo;
+
+    private String nombreArchivo;
 
     public ArchivoInventario(String nombre) throws IOException {
-        archivo = new RandomAccessFile(nombre, "rw");
+        this.nombreArchivo = nombre;
+        File file = new File(nombreArchivo);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
     }
 
-    public void guardar(Producto p, int pos) throws IOException {
-        archivo.seek(pos * Producto.TAM_REG);
-        archivo.writeInt(p.id);
-        archivo.writeChars(p.nombre);
-        archivo.writeChars(p.descripcion);
-        archivo.writeInt(p.existencia);
-        archivo.writeBoolean(p.estado);
+    public void guardar(Producto p) throws IOException {
+        List<Producto> lista = leerTodos();
+        boolean encontrado = false;
+
+        for (int i = 0; i < lista.size(); i++) {
+            if (lista.get(i).id == p.id) {
+                lista.set(i, p);
+                encontrado = true;
+                break;
+            }
+        }
+
+        if (!encontrado) {
+            lista.add(p);
+        }
+
+        try (PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo))) {
+            for (Producto prod : lista) {
+                pw.println(
+                        prod.id + "," +
+                        prod.nombre + "," +
+                        prod.descripcion + "," +
+                        prod.existencia + "," +
+                        prod.estado
+                );
+            }
+        }
     }
 
-    public Producto leer(int pos) throws IOException {
-        if ((pos + 1) * Producto.TAM_REG > archivo.length()) return null;
-        archivo.seek(pos * Producto.TAM_REG);
-        int id = archivo.readInt();
-        char[] nom = new char[Producto.TAM_NOMBRE];
-        for (int i = 0; i < nom.length; i++) 
-            nom[i] = archivo.readChar();
+    public List<Producto> leerTodos() throws IOException {
+        List<Producto> lista = new ArrayList<>();
 
-        char[] desc = new char[Producto.TAM_DESC];
-        for (int i = 0; i < desc.length; i++) desc[i] = archivo.readChar();
+        try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
+            String linea;
 
-        int existencia = archivo.readInt();
-        boolean estado = archivo.readBoolean();
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
 
-        return new Producto(id, new String(nom).trim(), new String(desc).trim(), existencia, estado);
+                String[] datos = linea.split(",");
+
+                if (datos.length == 5) {
+                    lista.add(new Producto(
+                            Integer.parseInt(datos[0]),
+                            datos[1],
+                            datos[2],
+                            Integer.parseInt(datos[3]),
+                            Boolean.parseBoolean(datos[4])
+                    ));
+                }
+            }
+        }
+
+        return lista;
     }
 
-    public int totalRegistros() throws IOException {
-        return (int) (archivo.length() / Producto.TAM_REG);
+    public Producto buscarPorId(int idBuscar) throws IOException {
+        for (Producto p : leerTodos()) {
+            if (p.id == idBuscar) {
+                return p;
+            }
+        }
+        return null;
     }
 }
