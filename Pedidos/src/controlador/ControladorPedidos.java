@@ -15,7 +15,6 @@ public class ControladorPedidos {
         this.vista = vista;
         this.archivo = new ArchivoTexto(nombreArchivo);
 
-        // Guardar pedido (no actualiza la tabla automáticamente)
         this.vista.getBtnGuardar().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -23,7 +22,6 @@ public class ControladorPedidos {
             }
         });
 
-        // Ver pedidos (actualiza la tabla solo al pulsar este botón)
         this.vista.getBtnVer().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -59,7 +57,6 @@ public class ControladorPedidos {
         if (ok) {
             JOptionPane.showMessageDialog(vista, "Pedido guardado.");
             vista.limpiarCampos();
-            // NO llamar mostrarPedidos() aquí
         } else {
             JOptionPane.showMessageDialog(vista, "Error al guardar el pedido.");
         }

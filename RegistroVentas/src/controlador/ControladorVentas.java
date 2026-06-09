@@ -16,7 +16,6 @@ public class ControladorVentas {
         this.vista = vista;
         this.archivo = new ArchivoTexto(nombreArchivo);
 
-        // Registrar venta (no actualiza la tabla aquí)
         this.vista.getBtnRegistrar().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -24,7 +23,6 @@ public class ControladorVentas {
             }
         });
 
-        // Ver ventas (actualiza la tabla solo cuando se pulsa este botón)
         this.vista.getBtnVer().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -62,7 +60,6 @@ public class ControladorVentas {
         if (ok) {
             JOptionPane.showMessageDialog(vista, "Venta registrada.");
             vista.limpiarCampos();
-            // **NO** llamar mostrarVentas() aquí: la tabla se actualiza solo al pulsar VENTAS
         } else {
             JOptionPane.showMessageDialog(vista, "Error al guardar la venta.");
         }
