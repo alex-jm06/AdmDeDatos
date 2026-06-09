@@ -41,7 +41,6 @@ public class ArchivoTexto {
         return lines;
     }
 
-    // Crea archivo con ejemplos si no existe (opcional)
     public void crearEjemploSiNoExiste(List<String> lines) {
         Path p = path;
         try {
