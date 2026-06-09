@@ -1,3 +1,4 @@
 Ismael|Calculo Integral|70.0
 Ismael|Calculo Integral|70.0
 Gabriel|Calculo Diferencial|100.0
+Yahir|Español|100.0

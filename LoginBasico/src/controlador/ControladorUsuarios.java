@@ -15,7 +15,6 @@ public class ControladorUsuarios {
         this.vista = vista;
         this.archivo = new ArchivoTexto(nombreArchivo);
 
-        // Conectar botones
         this.vista.getBtnRegistrar().addActionListener(e -> registrarUsuario());
         this.vista.getBtnIngresar().addActionListener(e -> validarLogin());
     }
@@ -29,7 +28,6 @@ public class ControladorUsuarios {
             return;
         }
 
-        // Evitar duplicados
         List<String> lines = archivo.leerLineas();
         for (String ln : lines) {
             Usuario u = Usuario.fromString(ln);

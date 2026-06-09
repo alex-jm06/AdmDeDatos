@@ -15,7 +15,6 @@ public class ControladorAsistencia {
         this.vista = vista;
         this.archivo = new ArchivoTexto(nombreArchivo);
 
-        // Guardar asistencia (no actualiza tabla automáticamente)
         this.vista.getBtnGuardar().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -23,7 +22,6 @@ public class ControladorAsistencia {
             }
         });
 
-        // Ver lista (actualiza tabla solo al pulsar este botón)
         this.vista.getBtnVer().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -47,7 +45,6 @@ public class ControladorAsistencia {
         if (ok) {
             JOptionPane.showMessageDialog(vista, "Asistencia registrada.");
             vista.limpiarCampos();
-            // NO llamar mostrarAsistencias() aquí
         } else {
             JOptionPane.showMessageDialog(vista, "Error al guardar la asistencia.");
         }

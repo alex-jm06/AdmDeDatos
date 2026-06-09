@@ -3,7 +3,7 @@ package modelo;
 public class Asistencia {
     private String nombre;
     private String fecha;
-    private String estado; // "Asistió" o "Faltó"
+    private String estado; 
 
     public Asistencia(String nombre, String fecha, String estado) {
         this.nombre = nombre == null ? "" : nombre.trim();
