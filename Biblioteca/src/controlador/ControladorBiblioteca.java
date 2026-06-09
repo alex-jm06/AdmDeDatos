@@ -15,7 +15,6 @@ public class ControladorBiblioteca {
         this.vista = vista;
         this.archivo = new ArchivoTexto(nombreArchivo);
 
-        // Agregar libro (no actualiza la tabla automáticamente)
         this.vista.getBtnAgregar().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -23,7 +22,6 @@ public class ControladorBiblioteca {
             }
         });
 
-        // Mostrar libros (actualiza la tabla solo al pulsar este botón)
         this.vista.getBtnMostrar().addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -42,7 +40,6 @@ public class ControladorBiblioteca {
             return;
         }
 
-        // Evitar ISBN duplicados
         List<String> lines = archivo.leerLineas();
         for (String ln : lines) {
             Libro pExist = Libro.fromString(ln);
@@ -57,7 +54,6 @@ public class ControladorBiblioteca {
         if (ok) {
             JOptionPane.showMessageDialog(vista, "Libro agregado.");
             vista.limpiarCampos();
-            // NO llamar mostrarLibros() aquí: la tabla se actualiza solo al pulsar MOSTRAR
         } else {
             JOptionPane.showMessageDialog(vista, "Error al guardar el libro.");
         }
